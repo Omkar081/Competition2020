@@ -23,10 +23,10 @@ public final class Constants {
     }
 
     public static final class DriveTalonIDs {
-        public static final int leftFrontID = 0;
-        public static final int leftBackID = 2;
-        public static final int rightFrontID = 1;
-        public static final int rightBackID = 3;
+        public static final int leftFrontID = 2;
+        public static final int leftBackID = 3;
+        public static final int rightFrontID = 0;
+        public static final int rightBackID = 1;
     }
 
     public static final class DriveConstants {
