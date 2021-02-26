@@ -17,17 +17,18 @@ import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import frc.robot.Constants;
+import frc.robot.Trajectories;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class SlalomTrajectory1 extends CommandBase {
   DriveSubsystem drive;
 
-  TrajectoryConfig trajectoryConfig = new TrajectoryConfig(
+  /*TrajectoryConfig trajectoryConfig = new TrajectoryConfig(
     Units.feetToMeters(Constants.DriveConstants.maxV), 
     Units.feetToMeters(Constants.DriveConstants.maxA)
-    );
+    ); */
 
-  Trajectory slalomtrajectory1 = TrajectoryGenerator.generateTrajectory(
+  /*Trajectory slalomtrajectory1 = TrajectoryGenerator.generateTrajectory(
     new Pose2d(0, 0, new Rotation2d(0)),
     List.of(
       new Translation2d(Units.feetToMeters(2.5), Units.feetToMeters(2.5)),
@@ -39,10 +40,10 @@ public class SlalomTrajectory1 extends CommandBase {
     ),
     new Pose2d(Units.feetToMeters(22.5), Units.feetToMeters(2.5), new Rotation2d(Math.PI/2)),
     trajectoryConfig
-    );
+    ); */
 
-    RamseteCommand ramseteCommand = new RamseteCommand(
-      slalomtrajectory1, 
+    /*RamseteCommand ramseteCommand = new RamseteCommand(
+      Trajectories.SlalomTrajectories.slalomTrajectory1, 
       drive::getRobotPose, 
       new RamseteController(2.0, 0.7),
       drive.getFeedForward(), 
@@ -53,6 +54,7 @@ public class SlalomTrajectory1 extends CommandBase {
       drive::setVoltageOutput, 
       drive
     );
+    */
   
   /** Creates a new SlalomTrajectory1. */
   public SlalomTrajectory1(DriveSubsystem drive) {
@@ -64,25 +66,27 @@ public class SlalomTrajectory1 extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    trajectoryConfig.setKinematics(drive.getKinematics());
-    slalomtrajectory1.getInitialPose();
+    //trajectoryConfig.setKinematics(drive.getKinematics());
+    //slalomtrajectory1.getInitialPose();
+    //ramseteCommand.initialize();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    ramseteCommand.execute();
+    //ramseteCommand.execute();
+    
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    ramseteCommand.end(interrupted);
+    //ramseteCommand.end(interrupted);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return ramseteCommand.isFinished();
+    return false;//ramseteCommand.isFinished();
   }
 }
