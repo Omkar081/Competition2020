@@ -1,22 +1,22 @@
 {
     # Ports for motors
     # If doing drive test, treat this as the left side of the drivetrain
-    "motorPorts": [0,1],
+    "motorPorts": [2,3],
     # Only if you are doing drive (leave empty "[]" if not)
-    "rightMotorPorts": [2,3],
+    "rightMotorPorts": [0,1],
     # Class names of motor controllers used.
     # 'WPI_TalonSRX'
     # 'WPI_VictorSPX'
     # 'WPI_TalonFX'
     # If doing drive test, treat this as the left side of the drivetrain
-    "controllerTypes": [WPI_TalonSRX, WPI_TalonFX],
+    "controllerTypes": ['WPI_VictorSPX', 'WPI_TalonSRX'],
     # Only if you are doing drive (leave empty "[]" if not)
-    "rightControllerTypes": [WPI_TalonSRX, WPI_TalonFX],
+    "rightControllerTypes": ['WPI_VictorSPX', 'WPI_TalonSRX'],
     # Set motors to inverted or not
     # If doing drive test, treat this as the left side of the drivetrain
-    "motorsInverted": [False],
+    "motorsInverted": [False, False],
     # Only if you are doing drive (leave empty "[]" if not)
-    "rightMotorsInverted": [False],
+    "rightMotorsInverted": [False, False],
     # Encoder edges-per-revolution (*NOT* cycles per revolution!)
     # For the CTRE Mag Encoder, use 4096 (4 * 1024 = 4096)
     "encoderEPR": 4096,

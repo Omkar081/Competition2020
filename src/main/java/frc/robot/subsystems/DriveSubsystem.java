@@ -26,7 +26,7 @@ public class DriveSubsystem extends SubsystemBase {
   
 
   AHRS gyro = new AHRS();
-  Pose2d pose;
+  Pose2d pose = new Pose2d();
 
   WPI_TalonSRX leftFront = new WPI_TalonSRX(Constants.DriveTalonIDs.leftFrontID);
   WPI_TalonSRX leftBack = new WPI_TalonSRX(Constants.DriveTalonIDs.leftBackID);
@@ -38,7 +38,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   DifferentialDrive diffDrive = new DifferentialDrive(leftDrive, rightDrive);
   DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(Constants.PhysicalRobotConstants.trackWidthInches));
-  DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(getHeading(),pose); 
+  DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(getHeading(), pose); 
 
   SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.PhysicalRobotConstants.kS, Constants.PhysicalRobotConstants.kV, Constants.PhysicalRobotConstants.kA);
 
@@ -52,12 +52,16 @@ public class DriveSubsystem extends SubsystemBase {
 
 
   public void drive(double speed, double rotation) {
-    diffDrive.arcadeDrive(speed, rotation);
+    diffDrive.arcadeDrive(-speed, rotation);
   }
 
   public void stop() {
     leftDrive.set(0);
     rightDrive.set(0);
+  }
+
+  public double getDistance() {
+    return Constants.PhysicalRobotConstants.feetPerTick *(leftFront.getSelectedSensorPosition() - rightFront.getSelectedSensorPosition())/2;
   }
 
   public Pose2d getRobotPose() {

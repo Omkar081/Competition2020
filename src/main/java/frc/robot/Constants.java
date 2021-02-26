@@ -19,14 +19,15 @@ public final class Constants {
         public static final double kS = 0.288; 
         public static final double kV = 1.788;
         public static final double kA = 0.245;
+        public static final double feetPerTick = 1.2207031E-4;
       
     }
 
     public static final class DriveTalonIDs {
-        public static final int leftFrontID = 0;
+        public static final int leftFrontID = 3;
         public static final int leftBackID = 2;
-        public static final int rightFrontID = 1;
-        public static final int rightBackID = 3;
+        public static final int rightFrontID = 0;
+        public static final int rightBackID = 1;
     }
 
     public static final class DriveConstants {

@@ -30,17 +30,17 @@ public class RobotContainer {
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
   private final Drive m_drive = new Drive(() -> joystick.getY(), () -> joystick.getX(), m_driveSubsystem);
 
-  TrajectoryConfig trajectoryConfig = new TrajectoryConfig(
+  /*TrajectoryConfig trajectoryConfig = new TrajectoryConfig(
     Units.feetToMeters(Constants.DriveConstants.maxV), 
     Units.feetToMeters(Constants.DriveConstants.maxA)
-    );
+    );*/
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
     m_driveSubsystem.setDefaultCommand(m_drive);
-    trajectoryConfig.setKinematics(m_driveSubsystem.getKinematics());
+    //trajectoryConfig.setKinematics(m_driveSubsystem.getKinematics());
   }
 
   /**
