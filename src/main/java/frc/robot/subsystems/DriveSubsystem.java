@@ -37,7 +37,7 @@ public class DriveSubsystem extends SubsystemBase {
   SpeedControllerGroup rightDrive = new SpeedControllerGroup(rightFront, rightBack);
 
   DifferentialDrive diffDrive = new DifferentialDrive(leftDrive, rightDrive);
-  DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(Constants.PhysicalRobotConstants.trackWidthInches));
+  DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(Constants.PhysicalRobotConstants.kTrackWidthMeters));
   DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(getHeading(), pose); 
 
   SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.PhysicalRobotConstants.kS, Constants.PhysicalRobotConstants.kV, Constants.PhysicalRobotConstants.kA);
@@ -76,6 +76,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   public DifferentialDriveKinematics getKinematics() {
     return kinematics;
+    
   }
 
   public double getLeftMotorVelocity() {
@@ -106,6 +107,11 @@ public class DriveSubsystem extends SubsystemBase {
   public void setVoltageOutput(double leftVoltage, double rightVoltage) {
     leftFront.setVoltage(leftVoltage);
     rightFront.setVoltage(rightVoltage);
+  }
+
+  public void resetEncoders() {
+    leftFront.setSelectedSensorPosition(0);
+    rightFront.setSelectedSensorPosition(0);
   }
   
   

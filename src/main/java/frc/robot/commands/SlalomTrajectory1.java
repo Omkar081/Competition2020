@@ -64,8 +64,10 @@ public class SlalomTrajectory1 extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    drive.resetEncoders();
     trajectoryConfig.setKinematics(drive.getKinematics());
     slalomtrajectory1.getInitialPose();
+  
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -78,6 +80,7 @@ public class SlalomTrajectory1 extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     ramseteCommand.end(interrupted);
+    drive.stop();
   }
 
   // Returns true when the command should end.

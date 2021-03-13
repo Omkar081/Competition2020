@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.util.Units;
 import frc.robot.commands.Drive;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.SlalomTrajectory1;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,6 +30,7 @@ public class RobotContainer {
 
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
   private final Drive m_drive = new Drive(() -> joystick.getY(), () -> joystick.getX(), m_driveSubsystem);
+  private final SlalomTrajectory1 slalomTrajectory1 = new SlalomTrajectory1(m_driveSubsystem);
 
   /*TrajectoryConfig trajectoryConfig = new TrajectoryConfig(
     Units.feetToMeters(Constants.DriveConstants.maxV), 
@@ -58,6 +60,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return m_autoCommand;
+    //return m_autoCommand;
+    return slalomTrajectory1;
   }
 }
