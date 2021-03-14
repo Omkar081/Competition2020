@@ -30,6 +30,8 @@ public class Drive extends CommandBase {
   @Override
   public void execute() {
     driveSubsystem.drive(speed.getAsDouble(), rotation.getAsDouble());
+    //System.out.println(driveSubsystem.isMotorInverted());
+    
   }
 
   // Called once the command ends or is interrupted.

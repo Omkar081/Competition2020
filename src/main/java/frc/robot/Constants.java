@@ -23,7 +23,8 @@ public final class Constants {
         public static final double kS = 0.579; //Volts
         public static final double kV = 2.37; //VoltsPerMeter
         public static final double kA = 0.21; //VoltsPerMeterSquared
-        public static final double feetPerTick = 1.2207031E-4;
+        public static final double feetPerTick = 1.2207031E-4; //feet conversion from ticks(one cycle on talon)
+        public static final int kMaxVoltage = 8;
         
       
     }
@@ -37,7 +38,7 @@ public final class Constants {
 
     public static final class DriveConstants {
         //change these values for yith
-        public static final double kP = 2.21; //value supplied is for WPILib PID integration, use 0.00048 for TalonFX PID integration
+        public static final double kP = 0.00048; //2.21 is for WPILib PID integration, use 0.00048 for TalonFX PID integration
         public static final double kI = 0.0;
         public static final double kD = 0.0;
         public static final double maxV = 2.5; //MetersPerSecond

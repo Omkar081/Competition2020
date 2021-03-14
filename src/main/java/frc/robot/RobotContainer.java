@@ -4,17 +4,36 @@
 
 package frc.robot;
 
+import java.io.IOException;
+import java.util.List;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.RamseteController;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.util.Units;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.PhysicalRobotConstants;
+import frc.robot.commands.BarrelRacing;
+import frc.robot.commands.Bounce;
 import frc.robot.commands.Drive;
 import frc.robot.commands.ExampleCommand;
-import frc.robot.commands.SlalomTrajectory1;
+import frc.robot.commands.SlalomTrajectory;
+//import frc.robot.commands.SlalomTrajectory1;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -30,7 +49,9 @@ public class RobotContainer {
 
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
   private final Drive m_drive = new Drive(() -> joystick.getY(), () -> joystick.getX(), m_driveSubsystem);
-  private final SlalomTrajectory1 slalomTrajectory1 = new SlalomTrajectory1(m_driveSubsystem);
+  /*private final SlalomTrajectory slalomTrajectory = new SlalomTrajectory(m_driveSubsystem);
+  private final BarrelRacing barrelRacing = new BarrelRacing(m_driveSubsystem);
+  private final Bounce bounce = new Bounce(m_driveSubsystem);*/
 
   /*TrajectoryConfig trajectoryConfig = new TrajectoryConfig(
     Units.feetToMeters(Constants.DriveConstants.maxV), 
@@ -61,6 +82,57 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
     //return m_autoCommand;
-    return slalomTrajectory1;
+    // Create a voltage constraint to ensure we don't accelerate too fast
+    var autoVoltageConstraint =
+        new DifferentialDriveVoltageConstraint(
+            new SimpleMotorFeedforward(PhysicalRobotConstants.kS, PhysicalRobotConstants.kV, PhysicalRobotConstants.kA),
+            DriveConstants.kDriveKinematics,
+            PhysicalRobotConstants.kMaxVoltage);
+
+      // Create config for trajectory
+    TrajectoryConfig config =
+    new TrajectoryConfig(DriveConstants.maxV, DriveConstants.maxA)
+        // Add kinematics to ensure max speed is actually obeyed
+        .setKinematics(DriveConstants.kDriveKinematics)
+        // Apply the voltage constraint
+        .addConstraint(autoVoltageConstraint);
+
+    Trajectory slalomtrajectory = TrajectoryGenerator.generateTrajectory(
+      new Pose2d(0, 0, new Rotation2d(0)),
+      List.of(
+        new Translation2d(Units.feetToMeters(5), Units.feetToMeters(0))
+        /*new Translation2d(Units.feetToMeters(2.5), Units.feetToMeters(2.5)),
+        new Translation2d(Units.feetToMeters(5), Units.feetToMeters(5)),
+        new Translation2d(Units.feetToMeters(10), Units.feetToMeters(5.5)),
+        new Translation2d(Units.feetToMeters(15), Units.feetToMeters(5)),
+        new Translation2d(Units.feetToMeters(17.5), Units.feetToMeters(2.5)),
+        new Translation2d(Units.feetToMeters(20), Units.feetToMeters(0)),
+        new Translation2d(Units.feetToMeters(22.5), Units.feetToMeters(2.5)),
+        new Translation2d(Units.feetToMeters(20), Units.feetToMeters(5)),
+        new Translation2d(Units.feetToMeters(15), Units.feetToMeters(0)),
+        new Translation2d(Units.feetToMeters(10), Units.feetToMeters(0)),
+        new Translation2d(Units.feetToMeters(5), Units.feetToMeters(0)) */
+      ),
+      new Pose2d(Units.feetToMeters(10), Units.feetToMeters(0), new Rotation2d(Math.PI/2)),
+      config
+      );
+
+      RamseteCommand ramseteCommand = new RamseteCommand(
+        slalomtrajectory, 
+        m_driveSubsystem::getRobotPose, 
+        new RamseteController(2.0, 0.7), 
+        new SimpleMotorFeedforward(PhysicalRobotConstants.kS, PhysicalRobotConstants.kV, PhysicalRobotConstants.kA), 
+        DriveConstants.kDriveKinematics, 
+        m_driveSubsystem::getWheelSpeeds, 
+        new PIDController(DriveConstants.kP, DriveConstants.kI, DriveConstants.kD), 
+        new PIDController(DriveConstants.kP, DriveConstants.kI, DriveConstants.kD), 
+        m_driveSubsystem::setVoltageOutput, 
+        m_driveSubsystem
+        );
+      //Reset odometry to the starting pose of the trajectory
+      m_driveSubsystem.resetOdometry(slalomtrajectory.getInitialPose());
+
+      //Run path following command, then stop at the end
+      return ramseteCommand.andThen(() -> m_driveSubsystem.setVoltageOutput(0, 0));
   }
 }

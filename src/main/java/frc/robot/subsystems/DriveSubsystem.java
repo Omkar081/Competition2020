@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 
@@ -28,16 +30,16 @@ public class DriveSubsystem extends SubsystemBase {
   AHRS gyro = new AHRS();
   Pose2d pose = new Pose2d();
 
-  WPI_TalonSRX leftFront = new WPI_TalonSRX(Constants.DriveTalonIDs.leftFrontID);
-  WPI_TalonSRX leftBack = new WPI_TalonSRX(Constants.DriveTalonIDs.leftBackID);
-  WPI_TalonSRX rightFront = new WPI_TalonSRX(Constants.DriveTalonIDs.rightFrontID);
-  WPI_TalonSRX rightBack = new WPI_TalonSRX(Constants.DriveTalonIDs.rightBackID);
+  WPI_TalonFX leftFront = new WPI_TalonFX(Constants.DriveTalonIDs.leftFrontID);
+  WPI_TalonFX leftBack = new WPI_TalonFX(Constants.DriveTalonIDs.leftBackID);
+  WPI_TalonFX rightFront = new WPI_TalonFX(Constants.DriveTalonIDs.rightFrontID);
+  WPI_TalonFX rightBack = new WPI_TalonFX(Constants.DriveTalonIDs.rightBackID);
 
   SpeedControllerGroup leftDrive = new SpeedControllerGroup(leftFront, leftBack);
   SpeedControllerGroup rightDrive = new SpeedControllerGroup(rightFront, rightBack);
 
   DifferentialDrive diffDrive = new DifferentialDrive(leftDrive, rightDrive);
-  DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(Constants.PhysicalRobotConstants.kTrackWidthMeters));
+  DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Constants.PhysicalRobotConstants.kTrackWidthMeters);
   DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(getHeading(), pose); 
 
   SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.PhysicalRobotConstants.kS, Constants.PhysicalRobotConstants.kV, Constants.PhysicalRobotConstants.kA);
@@ -48,11 +50,22 @@ public class DriveSubsystem extends SubsystemBase {
 
   
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {}
+  public DriveSubsystem() {
+    //leftFront.setSensorPhase(true);
+    //rightFront.setSensorPhase(true);
+    //diffDrive.setSafetyEnabled(false);
+    rightFront.setInverted(true);
+    rightBack.setInverted(true);
+  }
 
 
   public void drive(double speed, double rotation) {
-    diffDrive.arcadeDrive(-speed, rotation);
+    diffDrive.arcadeDrive(speed, rotation);
+  }
+
+  public boolean isMotorInverted() {
+    //System.out.println("Is this motor inverted???? " + isMotorInverted() + " my Lord.");
+    return rightBack.getInverted();
   }
 
   public void stop() {
@@ -104,6 +117,13 @@ public class DriveSubsystem extends SubsystemBase {
     return rightPIDController;
   }
 
+  public TalonFX getLeftTalonFX() {
+    return leftFront;
+  }
+  public TalonFX getRightTalonFX() {
+    return rightFront;
+  }
+
   public void setVoltageOutput(double leftVoltage, double rightVoltage) {
     leftFront.setVoltage(leftVoltage);
     rightFront.setVoltage(rightVoltage);
@@ -113,11 +133,27 @@ public class DriveSubsystem extends SubsystemBase {
     leftFront.setSelectedSensorPosition(0);
     rightFront.setSelectedSensorPosition(0);
   }
+
+  public void resetHeading() {
+    gyro.reset();
+  }
+
+  public void resetOdometry(Pose2d pose) {
+    resetEncoders();
+    odometry.resetPosition(pose, gyro.getRotation2d());
+  }
+
+  public double getTurnRate() {
+    return gyro.getRate();
+  }
   
   
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     pose = odometry.update(getHeading(), getLeftMotorVelocity(), getRightMotorVelocity());
+    //System.out.println("Is this motor inverted???? " + isMotorInverted() + " my Lord.");
+    System.out.println("LeftMotorVelocity: " + getLeftMotorVelocity());
+    System.out.println("RightMotorVelocity: " + getRightMotorVelocity());
   }
 } 

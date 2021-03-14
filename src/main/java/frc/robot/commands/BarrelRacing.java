@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class SlalomTrajectory1 extends CommandBase {
+public class BarrelRacing extends CommandBase {
   DriveSubsystem drive;
 
   TrajectoryConfig trajectoryConfig = new TrajectoryConfig(
@@ -27,22 +27,26 @@ public class SlalomTrajectory1 extends CommandBase {
     Units.feetToMeters(Constants.DriveConstants.maxA)
     );
 
-  Trajectory slalomtrajectory1 = TrajectoryGenerator.generateTrajectory(
+  Trajectory barrelRacing = TrajectoryGenerator.generateTrajectory(
     new Pose2d(0, 0, new Rotation2d(0)),
     List.of(
-      new Translation2d(Units.feetToMeters(2.5), Units.feetToMeters(2.5)),
-      new Translation2d(Units.feetToMeters(5), Units.feetToMeters(5)),
-      new Translation2d(Units.feetToMeters(10), Units.feetToMeters(5.5)),
-      new Translation2d(Units.feetToMeters(15), Units.feetToMeters(5)),
-      new Translation2d(Units.feetToMeters(17.5), Units.feetToMeters(2.5)),
-      new Translation2d(Units.feetToMeters(20), Units.feetToMeters(0))
+      new Translation2d(Units.feetToMeters(7.5), Units.feetToMeters(0)),
+      new Translation2d(Units.feetToMeters(9.5), Units.feetToMeters(-2.5)),
+      new Translation2d(Units.feetToMeters(7.5), Units.feetToMeters(-4.5)),
+      new Translation2d(Units.feetToMeters(5.5), Units.feetToMeters(-2.5)),
+      new Translation2d(Units.feetToMeters(15), Units.feetToMeters(2.5)),
+      new Translation2d(Units.feetToMeters(13), Units.feetToMeters(4.5)),
+      new Translation2d(Units.feetToMeters(17), Units.feetToMeters(-3.25)),
+      new Translation2d(Units.feetToMeters(21), Units.feetToMeters(-3.25)),
+      new Translation2d(Units.feetToMeters(19), Units.feetToMeters(0)),
+      new Translation2d(Units.feetToMeters(7.5), Units.feetToMeters(2))
     ),
-    new Pose2d(Units.feetToMeters(22.5), Units.feetToMeters(2.5), new Rotation2d(Math.PI/2)),
+    new Pose2d(Units.feetToMeters(0), Units.feetToMeters(2), new Rotation2d(Math.PI)),
     trajectoryConfig
     );
 
     RamseteCommand ramseteCommand = new RamseteCommand(
-      slalomtrajectory1, 
+      barrelRacing, 
       drive::getRobotPose, 
       new RamseteController(2.0, 0.7),
       drive.getFeedForward(), 
@@ -54,8 +58,8 @@ public class SlalomTrajectory1 extends CommandBase {
       drive
     );
   
-  /** Creates a new SlalomTrajectory1. */
-  public SlalomTrajectory1(DriveSubsystem drive) {
+  /** Creates a new BarrelRacing. */
+  public BarrelRacing(DriveSubsystem drive) {
     this.drive = drive;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(drive);
@@ -65,8 +69,9 @@ public class SlalomTrajectory1 extends CommandBase {
   @Override
   public void initialize() {
     drive.resetEncoders();
+    drive.resetHeading();
     trajectoryConfig.setKinematics(drive.getKinematics());
-    slalomtrajectory1.getInitialPose();
+    barrelRacing.getInitialPose();
   
   }
 
