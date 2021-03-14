@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import frc.robot.Constants;
+import frc.robot.Trajectories;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class SlalomTrajectory extends CommandBase {
@@ -25,7 +26,7 @@ public class SlalomTrajectory extends CommandBase {
   TrajectoryConfig trajectoryConfig = new TrajectoryConfig(
     Units.feetToMeters(Constants.DriveConstants.maxV), 
     Units.feetToMeters(Constants.DriveConstants.maxA)
-    );
+    ); 
 
   Trajectory slalomtrajectory = TrajectoryGenerator.generateTrajectory(
     new Pose2d(0, 0, new Rotation2d(0)),
@@ -44,7 +45,7 @@ public class SlalomTrajectory extends CommandBase {
     ),
     new Pose2d(Units.feetToMeters(0), Units.feetToMeters(5), new Rotation2d(Math.PI)),
     trajectoryConfig
-    );
+    ); 
 
     RamseteCommand ramseteCommand = new RamseteCommand(
       slalomtrajectory, 
@@ -58,6 +59,7 @@ public class SlalomTrajectory extends CommandBase {
       drive::setVoltageOutput, 
       drive
     );
+    
   
   /** Creates a new SlalomTrajectory1. */
   public SlalomTrajectory(DriveSubsystem drive) {
@@ -79,7 +81,8 @@ public class SlalomTrajectory extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    ramseteCommand.execute();
+    //ramseteCommand.execute();
+    
   }
 
   // Called once the command ends or is interrupted.
@@ -92,6 +95,6 @@ public class SlalomTrajectory extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return ramseteCommand.isFinished();
+    return false;//ramseteCommand.isFinished();
   }
 }
