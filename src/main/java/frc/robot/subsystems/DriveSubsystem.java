@@ -156,5 +156,7 @@ public class DriveSubsystem extends SubsystemBase {
     //System.out.println("Is this motor inverted???? " + isMotorInverted() + " my Lord.");
     System.out.println("LeftMotorVelocity: " + getLeftMotorVelocity());
     System.out.println("RightMotorVelocity: " + getRightMotorVelocity());
+
+    //robot went back and forth weirdly so that's why we did print statements
   }
 } 
