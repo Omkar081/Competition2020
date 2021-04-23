@@ -45,7 +45,7 @@ public class Bounce extends CommandBase {
 
     RamseteCommand ramseteCommand = new RamseteCommand(
       bounce, 
-      drive::getRobotPose, 
+      drive::getPose, 
       new RamseteController(2.0, 0.7),
       drive.getFeedForward(), 
       drive.getKinematics(), 

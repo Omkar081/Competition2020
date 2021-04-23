@@ -24,7 +24,18 @@ public final class Constants {
         public static final double kV = 2.37; //VoltsPerMeter
         public static final double kA = 0.21; //VoltsPerMeterSquared
         public static final double feetPerTick = 1.2207031E-4; //feet conversion from ticks(one cycle on talon)
-        public static final int kMaxVoltage = 8;
+        public static final double metersPerTick = (2048/4.67) * (1000/Math.PI * 6 * 2.54);
+        public static final double kMaxVoltage = 8; //max is 12V
+        public static final double tickSpeedInMetersPerSec = 1861.2;
+        public static final int kFalconCPR = 2048;
+        public static final double kGearRatio = 4.67;
+        public static final double kWheelDiameterMeters = 0.1524;
+        
+
+        
+
+       
+
         
       
     }
@@ -39,10 +50,10 @@ public final class Constants {
     public static final class DriveConstants {
         //change these values for yith
         public static final double kP = 0.00048; //2.21 is for WPILib PID integration, use 0.00048 for TalonFX PID integration
-        public static final double kI = 0.0;
-        public static final double kD = 0.0;
-        public static final double maxV = 2.5; //MetersPerSecond
-        public static final double maxA = 1.7; //MetersPerSecondSquared
+        public static final double kI = 0;
+        public static final double kD = 0;
+        public static final double maxV = 3; //MetersPerSecond
+        public static final double maxA = 1.5; //MetersPerSecondSquared
         public static final DifferentialDriveKinematics kDriveKinematics =
         new DifferentialDriveKinematics(PhysicalRobotConstants.kTrackWidthMeters);
         

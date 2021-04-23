@@ -30,7 +30,8 @@ public class Drive extends CommandBase {
   @Override
   public void execute() {
     driveSubsystem.drive(speed.getAsDouble(), rotation.getAsDouble());
-    //System.out.println(driveSubsystem.isMotorInverted());
+    //System.out.println("Drive Speed:" + speed.getAsDouble());
+    //System.out.println("Rotation Speed:" + rotation.getAsDouble());
     
   }
 

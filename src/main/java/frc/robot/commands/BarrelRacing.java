@@ -47,7 +47,7 @@ public class BarrelRacing extends CommandBase {
 
     RamseteCommand ramseteCommand = new RamseteCommand(
       barrelRacing, 
-      drive::getRobotPose, 
+      drive::getPose, 
       new RamseteController(2.0, 0.7),
       drive.getFeedForward(), 
       drive.getKinematics(), 
