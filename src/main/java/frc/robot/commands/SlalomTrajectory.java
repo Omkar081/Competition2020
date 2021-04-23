@@ -24,6 +24,11 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.PhysicalRobotConstants;
 import frc.robot.subsystems.DriveSubsystem;
 
+
+/**
+ * I belive that this class is not needed right now because we swithched to putting this stuff in the robot container.
+ * @deprecated
+ */
 public class SlalomTrajectory extends CommandBase {
   DriveSubsystem drive;
 
