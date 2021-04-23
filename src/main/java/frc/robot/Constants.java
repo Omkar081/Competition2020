@@ -27,10 +27,13 @@ public final class Constants {
         public static final double metersPerTick = (2048/4.67) * (1000/Math.PI * 6 * 2.54);
         public static final double kMaxVoltage = 8; //max is 12V
         public static final double tickSpeedInMetersPerSec = 1861.2;
-        public static final int kFalconCPR = 2048;
+        public static final int kFalconCPR = 4096;
         public static final double kGearRatio = 4.67;
         public static final double kWheelDiameterMeters = 0.1524;
+        public static final double ticksPerRotation = kFalconCPR / kGearRatio;
         
+
+
 
         
 

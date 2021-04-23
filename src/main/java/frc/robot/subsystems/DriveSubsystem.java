@@ -86,10 +86,17 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public double nativeUnitsToDistanceMeters(double ticks) {
-    double motorRotations = ticks / PhysicalRobotConstants.kEncoderCPR;
+    double motorRotations = ticks / PhysicalRobotConstants.kFalconCPR;
     double wheelRotations = motorRotations / PhysicalRobotConstants.kGearRatio;
     double positionMeters = wheelRotations * (Math.PI * PhysicalRobotConstants.kWheelDiameterMeters);
     return positionMeters;
+  }
+
+  public double nativeUnitsToMetersPerSec(double ticks) {
+    double ticksPerSec = leftFront.getSelectedSensorVelocity() * 10;
+    double rotationsPerSec = ticksPerSec / PhysicalRobotConstants.kFalconCPR;
+    double metersPerSec = rotationsPerSec *(PhysicalRobotConstants.kWheelDiameterMeters * Math.PI);
+    return metersPerSec;
   }
   
   /* public double getMotorVeloctyLeft() {
@@ -104,23 +111,33 @@ public class DriveSubsystem extends SubsystemBase {
     return odometry.getPoseMeters();
   }
 
-  public Rotation2d getHeading(){
-    idealRotation2d = gyro.getRotation2d().fromDegrees(yawError);
+  public double getHeading(){
+    return gyro.getRotation2d().getDegrees();
+    /*idealRotation2d = gyro.getRotation2d().fromDegrees(yawError);
     System.out.println("Current Heading::: " + gyro.getRotation2d());
-    return idealRotation2d;
+    return idealRotation2d; */
     //gyroscopes return positive values for clockwise but in standard convention it's the opposite(how the unit circle works)
     
   }
 
   public DifferentialDriveKinematics getKinematics() {
     return kinematics;
-    
   }
 
+  public double getLeftDistanceMeters() {
+    return nativeUnitsToDistanceMeters(leftFront.getSelectedSensorPosition());
+  }
+
+  public double getRighttDistanceMeters() {
+    return nativeUnitsToDistanceMeters(rightFront.getSelectedSensorPosition());
+  }
+
+
   public double getLeftMotorVelocity() {
-    double ticksPerSec = leftFront.getSelectedSensorVelocity() * 10;
-    double metersPerSec = PhysicalRobotConstants.metersPerTick * ticksPerSec;
-    return metersPerSec;
+   System.out.println("VELOCITY OF LEFT In m/s:::::: " + nativeUnitsToMetersPerSec(leftFront.getSelectedSensorVelocity()));
+   return nativeUnitsToMetersPerSec(leftFront.getSelectedSensorVelocity());
+    //double metersPerSec = PhysicalRobotConstants.metersPerTick * ticksPerSec;
+   // return metersPerSec;
 
     /*double distanceMeters = nativeUnitsToDistanceMeters(leftFront.getSelectedSensorPosition()); //runs every .02 sec
     System.out.println("Distance in Meters::::::: " + distanceMeters);
@@ -133,9 +150,12 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public double getRightMotorVelocity() {
-    double ticksPerSec = rightFront.getSelectedSensorVelocity() * 10;
-    double metersPerSec = PhysicalRobotConstants.metersPerTick * ticksPerSec;
-    return metersPerSec;
+    System.out.println("VELOCITY OF RIGHT In m/s:::::: " + nativeUnitsToMetersPerSec(leftFront.getSelectedSensorVelocity()));
+    return nativeUnitsToMetersPerSec(leftFront.getSelectedSensorVelocity());
+    
+    //double ticksPerSec = rightFront.getSelectedSensorVelocity() * 10;
+    //double metersPerSec = PhysicalRobotConstants.metersPerTick * ticksPerSec;
+    //return metersPerSec;
     /*double distanceMeters = nativeUnitsToDistanceMeters(rightFront.getSelectedSensorPosition()); //runs every .02 sec
     System.out.println("Distance in Meters::::::: " + distanceMeters);
     System.out.println("Velocity in Meters/Sec::::::: " + distanceMeters/.02);
@@ -173,7 +193,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void setVoltageOutput(double leftVoltage, double rightVoltage) {
     leftFront.setVoltage(leftVoltage);
-    rightFront.setVoltage(rightVoltage);
+    rightFront.setVoltage(-rightVoltage);
     diffDrive.feed();
   }
 
@@ -221,7 +241,7 @@ public class DriveSubsystem extends SubsystemBase {
       System.out.println("YAW ERROR::: " + yawError);
     }*/
     //System.out.println("PRE-PERIODIC HEADING::::" + gyro.getRotation2d());
-    odometry.update(getHeading(), getLeftMotorVelocity(), getRightMotorVelocity());
+    odometry.update(gyro.getRotation2d(),getLeftDistanceMeters(), getRighttDistanceMeters()); //getLeftMotorVelocity(), getRightMotorVelocity());
     //System.out.println("POST-PERIODIC HEADING::::" + gyro.getRotation2d());
     //System.out.println("Is this motor inverted???? " + isMotorInverted() + " my Lord.");
     //System.out.println("LeftMotorVelocity: " + getLeftMotorVelocity());
