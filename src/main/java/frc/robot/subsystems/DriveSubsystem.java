@@ -4,12 +4,10 @@
 
 package frc.robot.subsystems;
 
-import java.util.concurrent.TimeUnit;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.kauailabs.navx.frc.AHRS;
-
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
@@ -24,28 +22,33 @@ import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.PhysicalRobotConstants;
 
+/**
+ * This is the Drive Subsystem of our Robot. It contains some essential methods like drive, stop, getDistance, etc.
+ * @author Zachary Hansen Terry and Pranav Vogeti
+ */
 public class DriveSubsystem extends SubsystemBase {
   
 
   AHRS gyro = new AHRS();
   //Pose2d pose = new Pose2d();
 
-  WPI_TalonFX leftFront = new WPI_TalonFX(Constants.DriveTalonIDs.leftFrontID);
-  WPI_TalonFX leftBack = new WPI_TalonFX(Constants.DriveTalonIDs.leftBackID);
-  WPI_TalonFX rightFront = new WPI_TalonFX(Constants.DriveTalonIDs.rightFrontID);
-  WPI_TalonFX rightBack = new WPI_TalonFX(Constants.DriveTalonIDs.rightBackID);
+  WPI_TalonFX leftFront = new WPI_TalonFX(Constants.DriveTalonIDs.leftFrontID);         // Creates the physical left front Talon motor as an object in the code
+  WPI_TalonFX leftBack = new WPI_TalonFX(Constants.DriveTalonIDs.leftBackID);           // Creates the physical left back Talon Motor in the code
+  WPI_TalonFX rightFront = new WPI_TalonFX(Constants.DriveTalonIDs.rightFrontID);       // Creates the right front motor on the robot in the code
+  WPI_TalonFX rightBack = new WPI_TalonFX(Constants.DriveTalonIDs.rightBackID);         // Creates right rear motor in the code.
+ 
 
-  SpeedControllerGroup leftDrive = new SpeedControllerGroup(leftFront, leftBack);
-  SpeedControllerGroup rightDrive = new SpeedControllerGroup(rightFront, rightBack);
+  SpeedControllerGroup leftDrive = new SpeedControllerGroup(leftFront, leftBack);       // Makes a group of the two left motors that can be treated similarly to one motor
+  SpeedControllerGroup rightDrive = new SpeedControllerGroup(rightFront, rightBack);    // Maes a group of the motors on the right of the robot that have similar propertirs to a motor object
 
-  DifferentialDrive diffDrive = new DifferentialDrive(leftDrive, rightDrive);
-  DifferentialDriveKinematics kinematics = DriveConstants.kDriveKinematics;
+  DifferentialDrive diffDrive = new DifferentialDrive(leftDrive, rightDrive);           // Makes a grouping of all the motors together that can be controlled like a motor
+  DifferentialDriveKinematics kinematics = DriveConstants.kDriveKinematics;             // Honestly IDK ask pranav
   
-  DifferentialDriveOdometry odometry;//new DifferentialDriveOdometry(getHeading(), pose); 
+  DifferentialDriveOdometry odometry;       // Makes a odometer that allows us to track the robot on the field.
 
   SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.PhysicalRobotConstants.kS, Constants.PhysicalRobotConstants.kV, Constants.PhysicalRobotConstants.kA);
 
-  PIDController leftPIDController = new PIDController(DriveConstants.kP, DriveConstants.kI, DriveConstants.kD);
+  PIDController leftPIDController = new PIDController(DriveConstants.kP, DriveConstants.kI, DriveConstants.kD); 
   PIDController rightPIDController = new PIDController(DriveConstants.kP, DriveConstants.kI, DriveConstants.kD);
 
   static double yawError = 0;
@@ -56,11 +59,6 @@ public class DriveSubsystem extends SubsystemBase {
   
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-    //leftFront.setSensorPhase(true);
-    //rightFront.setSensorPhase(true);
-    //diffDrive.setSafetyEnabled(true);
-    //rightFront.setInverted(true);
-    //rightBack.setInverted(true);
     System.out.println("Drive system initializing!");
     resetEncoders();
     odometry = new DifferentialDriveOdometry(gyro.getRotation2d()); 
@@ -71,11 +69,9 @@ public class DriveSubsystem extends SubsystemBase {
     diffDrive.arcadeDrive(speed, rotation);
   }
 
-  /*public boolean isMotorInverted() {
-    //System.out.println("Is this motor inverted???? " + isMotorInverted() + " my Lord.");
-    return rightBack.getInverted();
-  }*/
-
+  /**
+   * Stops all of the motors
+   */
   public void stop() {
     leftDrive.set(0);
     rightDrive.set(0);
@@ -85,6 +81,11 @@ public class DriveSubsystem extends SubsystemBase {
     return Constants.PhysicalRobotConstants.feetPerTick *(leftFront.getSelectedSensorPosition() - rightFront.getSelectedSensorPosition())/2;
   }
 
+  /**
+   * Translates the ticks that the encoders provide to meters that we can use.
+   * @param ticks
+   * @return distance in meters
+   */
   public double nativeUnitsToDistanceMeters(double ticks) {
     double motorRotations = ticks / PhysicalRobotConstants.kFalconCPR;
     double wheelRotations = motorRotations / PhysicalRobotConstants.kGearRatio;
@@ -92,6 +93,11 @@ public class DriveSubsystem extends SubsystemBase {
     return positionMeters;
   }
 
+  /**
+   * Translates the encoders native units of ticks per 100ms to meters per second
+   * @param ticks
+   * @return Meters per second
+   */
   public double nativeUnitsToMetersPerSec(double ticks) {
     double ticksPerSec = leftFront.getSelectedSensorVelocity() * 10;
     double rotationsPerSec = ticksPerSec / PhysicalRobotConstants.kFalconCPR;
@@ -99,18 +105,20 @@ public class DriveSubsystem extends SubsystemBase {
     return metersPerSec;
   }
   
-  /* public double getMotorVeloctyLeft() {
-    return leftFront.getSelectedSensorVelocity();
-  }
-  public double getMotorVeloctyRight() {
-    return rightFront.getSelectedSensorVelocity();
-  } */
 
+  /**
+   * Tells us the position in meters of the robot.
+   * @return position in meters
+   */
   public Pose2d getPose() {
     System.out.println("Current Robot Pose::: " + odometry.getPoseMeters());
     return odometry.getPoseMeters();
   }
 
+  /**
+   * Tells us the heading of the robot (yaw)
+   * @return heading in degrees
+   */
   public double getHeading(){
     return gyro.getRotation2d().getDegrees();
     /*idealRotation2d = gyro.getRotation2d().fromDegrees(yawError);
@@ -124,47 +132,50 @@ public class DriveSubsystem extends SubsystemBase {
     return kinematics;
   }
 
+  /**
+   * Tells us the distance that the motor has traveled
+   * @return Meters that the left motor has traveled
+   * @see nativeUnitsToDistanceMeters
+   * {@link #nativeUnitsToDistanceMeters(double)}
+   */
   public double getLeftDistanceMeters() {
     return nativeUnitsToDistanceMeters(leftFront.getSelectedSensorPosition());
   }
 
+/**
+   * Tells us the distance that the motor has traveled
+   * @return Meters that the right motor has traveled
+   * @see nativeUnitsToDistanceMeters
+   * {@link #nativeUnitsToDistanceMeters(double)}
+   */
   public double getRighttDistanceMeters() {
     return nativeUnitsToDistanceMeters(rightFront.getSelectedSensorPosition());
   }
 
-
+  /**
+   * Tells us the velocity of the left motor in meters per second.
+   * @return m/s
+   * @see
+   * {@link #nativeUnitsToMetersPerSec(double)}
+   */
   public double getLeftMotorVelocity() {
    System.out.println("VELOCITY OF LEFT In m/s:::::: " + nativeUnitsToMetersPerSec(leftFront.getSelectedSensorVelocity()));
    return nativeUnitsToMetersPerSec(leftFront.getSelectedSensorVelocity());
-    //double metersPerSec = PhysicalRobotConstants.metersPerTick * ticksPerSec;
-   // return metersPerSec;
 
-    /*double distanceMeters = nativeUnitsToDistanceMeters(leftFront.getSelectedSensorPosition()); //runs every .02 sec
-    System.out.println("Distance in Meters::::::: " + distanceMeters);
-    System.out.println("Velocity in Meters/Sec::::::: " + distanceMeters/.02);
-    return distanceMeters/.02; */
-    // .distanceMe
-    
-    //return leftFront.getSelectedSensorVelocity() / 1861; //ticks/100ms * () -> m/sec
-    //need to convert from raw sensor units to meters per second
   }
 
+  /**
+   * Tells us the velocity of the right motor in meters per second/
+   * @return m/s
+   * @see
+   * {@link #nativeUnitsToMetersPerSec(double)}
+   */
   public double getRightMotorVelocity() {
     System.out.println("VELOCITY OF RIGHT In m/s:::::: " + nativeUnitsToMetersPerSec(leftFront.getSelectedSensorVelocity()));
     return nativeUnitsToMetersPerSec(leftFront.getSelectedSensorVelocity());
-    
-    //double ticksPerSec = rightFront.getSelectedSensorVelocity() * 10;
-    //double metersPerSec = PhysicalRobotConstants.metersPerTick * ticksPerSec;
-    //return metersPerSec;
-    /*double distanceMeters = nativeUnitsToDistanceMeters(rightFront.getSelectedSensorPosition()); //runs every .02 sec
-    System.out.println("Distance in Meters::::::: " + distanceMeters);
-    System.out.println("Velocity in Meters/Sec::::::: " + distanceMeters/.02);
-    return distanceMeters/.02;*/
-    //return rightFront.getSelectedSensorVelocity() / 1861;
-    //need to convert from raw sensor units/100ms to meters per second
-    // 4096 ticks/
   }
 
+ 
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
     return new DifferentialDriveWheelSpeeds(getLeftMotorVelocity(), getRightMotorVelocity());
   }
@@ -173,6 +184,11 @@ public class DriveSubsystem extends SubsystemBase {
     return feedforward;
   }
 
+  /**
+   * IDK if we ever use this in the code but im to scared to remove it so good luck. (probably removable but I dont want to find out.)
+   * @see
+   * {@link #getHeading()}
+   */
   public double getHeadingDegrees() {
     return gyro.getRotation2d().getDegrees();
   }
@@ -191,17 +207,24 @@ public class DriveSubsystem extends SubsystemBase {
     return rightFront;
   }
 
+  /**
+   * Sets the voltage output for the left and right motors.
+   * @param leftVoltage
+   * @param rightVoltage
+   */
   public void setVoltageOutput(double leftVoltage, double rightVoltage) {
     leftFront.setVoltage(leftVoltage);
     rightFront.setVoltage(-rightVoltage);
     diffDrive.feed();
   }
 
+  /**Resets encoders for left and right motors.*/
   public void resetEncoders() {
     leftFront.setSelectedSensorPosition(0);
     rightFront.setSelectedSensorPosition(0);
   }
 
+  /**Resets the yaw value of the gyro.*/
   public void resetHeading() {
     System.out.println("Resetting the yaw value of the gyro!");
     gyro.reset();
@@ -219,6 +242,10 @@ public class DriveSubsystem extends SubsystemBase {
     System.out.println("Initial Heading Values::: " + gyro.getRotation2d());
   }
 
+   /**
+    * resets the odometer
+    * @param pose
+    */
   public void resetOdometry(Pose2d pose) {
     resetEncoders();
     gyro.reset();
@@ -231,21 +258,11 @@ public class DriveSubsystem extends SubsystemBase {
     return -gyro.getRate();
   }
   
-  
+  /**
+   * Updates the odometer everytime it is called. Remember: a odometer needs Distance and rotation, not Rotation and velocity. :)
+   */
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-
-    /*if (yawError == 0) {
-      yawError = gyro.getYaw();
-      System.out.println("YAW ERROR::: " + yawError);
-    }*/
-    //System.out.println("PRE-PERIODIC HEADING::::" + gyro.getRotation2d());
-    odometry.update(gyro.getRotation2d(),getLeftDistanceMeters(), getRighttDistanceMeters()); //getLeftMotorVelocity(), getRightMotorVelocity());
-    //System.out.println("POST-PERIODIC HEADING::::" + gyro.getRotation2d());
-    //System.out.println("Is this motor inverted???? " + isMotorInverted() + " my Lord.");
-    //System.out.println("LeftMotorVelocity: " + getLeftMotorVelocity());
-    //System.out.println("RightMotorVelocity: " + getRightMotorVelocity());
-
+    odometry.update(gyro.getRotation2d(),getLeftDistanceMeters(), getRighttDistanceMeters()); 
   }
 } 
