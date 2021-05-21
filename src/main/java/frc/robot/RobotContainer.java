@@ -90,9 +90,8 @@ public class RobotContainer {
     Trajectory slalomtrajectory = TrajectoryGenerator.generateTrajectory(
         new Pose2d(0, 0, new Rotation2d(0)),
         List.of(
-          new Translation2d(Units.feetToMeters(0.5), Units.feetToMeters(0))
-          //new Translation2d(Units.feetToMeters(3.5), Units.feetToMeters(0))
-          /*new Translation2d(Units.feetToMeters(15), Units.feetToMeters(0)),
+          new Translation2d(Units.feetToMeters(8.0), Units.feetToMeters(0))
+          /*new Translation2d(Units.feetToMeters(2.5), Units.feetToMeters(2.5)),
           new Translation2d(Units.feetToMeters(5), Units.feetToMeters(5)),
           new Translation2d(Units.feetToMeters(10), Units.feetToMeters(5.5)),
           new Translation2d(Units.feetToMeters(15), Units.feetToMeters(5)),
@@ -103,8 +102,9 @@ public class RobotContainer {
           new Translation2d(Units.feetToMeters(15), Units.feetToMeters(0)),
           new Translation2d(Units.feetToMeters(10), Units.feetToMeters(0)),
           new Translation2d(Units.feetToMeters(5), Units.feetToMeters(0)) */
+    
         ),
-        new Pose2d(Units.feetToMeters(2), Units.feetToMeters(0), new Rotation2d(0)),
+        new Pose2d(Units.feetToMeters(8.0), Units.feetToMeters(0), new Rotation2d(0)),
         config
       ); 
 

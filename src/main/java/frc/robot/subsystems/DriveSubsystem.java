@@ -5,6 +5,10 @@
 package frc.robot.subsystems;
 
 
+//import java.sql.Time;
+//import java.util.Timer;
+//import java.time;
+
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.kauailabs.navx.frc.AHRS;
@@ -28,6 +32,7 @@ import frc.robot.Constants.PhysicalRobotConstants;
  */
 public class DriveSubsystem extends SubsystemBase {
   
+ Thread outputThread = new Thread();
 
   AHRS gyro = new AHRS();
   //Pose2d pose = new Pose2d();
@@ -51,8 +56,8 @@ public class DriveSubsystem extends SubsystemBase {
   PIDController leftPIDController = new PIDController(DriveConstants.kP, DriveConstants.kI, DriveConstants.kD); 
   PIDController rightPIDController = new PIDController(DriveConstants.kP, DriveConstants.kI, DriveConstants.kD);
 
-  static double yawError = 0;
-  static Rotation2d idealRotation2d;
+ // static double yawError = 0;
+  //static Rotation2d idealRotation2d;
 
 
 
@@ -87,22 +92,26 @@ public class DriveSubsystem extends SubsystemBase {
    * @return distance in meters
    */
   public double nativeUnitsToDistanceMeters(double ticks) {
-    double motorRotations = ticks / PhysicalRobotConstants.kFalconCPR;
+    return (PhysicalRobotConstants.feetPerTick * ticks) / 3.28;
+    /*double motorRotations = ticks / PhysicalRobotConstants.kFalconCPR;
     double wheelRotations = motorRotations / PhysicalRobotConstants.kGearRatio;
     double positionMeters = wheelRotations * (Math.PI * PhysicalRobotConstants.kWheelDiameterMeters);
-    return positionMeters;
+    return positionMeters;*/
   }
 
   /**
    * Translates the encoders native units of ticks per 100ms to meters per second
-   * @param ticks
+   * @param ticksPerDecisecond
    * @return Meters per second
    */
-  public double nativeUnitsToMetersPerSec(double ticks) {
-    double ticksPerSec = leftFront.getSelectedSensorVelocity() * 10;
-    double rotationsPerSec = ticksPerSec / PhysicalRobotConstants.kFalconCPR;
-    double metersPerSec = rotationsPerSec *(PhysicalRobotConstants.kWheelDiameterMeters * Math.PI);
-    return metersPerSec;
+  public double nativeUnitsToMetersPerSec(double ticksPerDeciSecond) {
+    double ticksPerSec = ticksPerDeciSecond * 10; 
+    return (ticksPerSec * PhysicalRobotConstants.feetPerTick)/ 3.28;
+
+    /*double motorRotationsPerSec = ticksPerSec / PhysicalRobotConstants.kFalconCPR;
+    double wheelRotationsPerSec = motorRotationsPerSec / PhysicalRobotConstants.kGearRatio;
+    double metersPerSec = wheelRotationsPerSec *(PhysicalRobotConstants.kWheelDiameterMeters * Math.PI);
+    return metersPerSec;*/
   }
   
 
@@ -139,7 +148,7 @@ public class DriveSubsystem extends SubsystemBase {
    * {@link #nativeUnitsToDistanceMeters(double)}
    */
   public double getLeftDistanceMeters() {
-    return nativeUnitsToDistanceMeters(leftFront.getSelectedSensorPosition());
+    return nativeUnitsToDistanceMeters((double) leftFront.getSelectedSensorPosition());
   }
 
 /**
@@ -148,8 +157,8 @@ public class DriveSubsystem extends SubsystemBase {
    * @see nativeUnitsToDistanceMeters
    * {@link #nativeUnitsToDistanceMeters(double)}
    */
-  public double getRighttDistanceMeters() {
-    return nativeUnitsToDistanceMeters(rightFront.getSelectedSensorPosition());
+  public double getRightDistanceMeters() {
+    return nativeUnitsToDistanceMeters((double) rightFront.getSelectedSensorPosition());
   }
 
   /**
@@ -159,8 +168,8 @@ public class DriveSubsystem extends SubsystemBase {
    * {@link #nativeUnitsToMetersPerSec(double)}
    */
   public double getLeftMotorVelocity() {
-   System.out.println("VELOCITY OF LEFT In m/s:::::: " + nativeUnitsToMetersPerSec(leftFront.getSelectedSensorVelocity()));
-   return nativeUnitsToMetersPerSec(leftFront.getSelectedSensorVelocity());
+   //System.out.println("VELOCITY OF LEFT In m/s:::::: " + nativeUnitsToMetersPerSec(leftFront.getSelectedSensorVelocity()));
+   return nativeUnitsToMetersPerSec((double)leftFront.getSelectedSensorVelocity());
 
   }
 
@@ -171,8 +180,8 @@ public class DriveSubsystem extends SubsystemBase {
    * {@link #nativeUnitsToMetersPerSec(double)}
    */
   public double getRightMotorVelocity() {
-    System.out.println("VELOCITY OF RIGHT In m/s:::::: " + nativeUnitsToMetersPerSec(leftFront.getSelectedSensorVelocity()));
-    return nativeUnitsToMetersPerSec(leftFront.getSelectedSensorVelocity());
+  //  System.out.println("VELOCITY OF RIGHT In m/s:::::: " + nativeUnitsToMetersPerSec(rightFront.getSelectedSensorVelocity()));
+    return nativeUnitsToMetersPerSec((double)rightFront.getSelectedSensorVelocity());
   }
 
  
@@ -185,7 +194,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
-   * IDK if we ever use this in the code but im to scared to remove it so good luck. (probably removable but I dont want to find out.)
+   * I don't know if we ever use this in the code but I'm too scared to remove it so good luck(probably removable but I dont want to find out).
    * @see
    * {@link #getHeading()}
    */
@@ -229,7 +238,7 @@ public class DriveSubsystem extends SubsystemBase {
     System.out.println("Resetting the yaw value of the gyro!");
     gyro.reset();
 
-    while(gyro.isCalibrating()) {
+    /*while(gyro.isCalibrating()) {
       try {
         System.out.println("Gyro is calibrating!");
         Thread.sleep(200);
@@ -237,9 +246,9 @@ public class DriveSubsystem extends SubsystemBase {
         Thread.currentThread().interrupt();
       }
       yawError = 0;
-    }
+    }*/
 
-    System.out.println("Initial Heading Values::: " + gyro.getRotation2d());
+    //System.out.println("Initial Heading Values::: " + gyro.getRotation2d());
   }
 
    /**
@@ -248,7 +257,7 @@ public class DriveSubsystem extends SubsystemBase {
     */
   public void resetOdometry(Pose2d pose) {
     resetEncoders();
-    gyro.reset();
+    //gyro.reset();
     System.out.println("Heading before:: " + gyro.getRotation2d());
     odometry.resetPosition(pose, gyro.getRotation2d());
     System.out.println("Heading after:: " + gyro.getRotation2d());
@@ -263,6 +272,9 @@ public class DriveSubsystem extends SubsystemBase {
    */
   @Override
   public void periodic() {
-    odometry.update(gyro.getRotation2d(),getLeftDistanceMeters(), getRighttDistanceMeters()); 
-  }
-} 
+    odometry.update(gyro.getRotation2d(),getLeftDistanceMeters(), getRightDistanceMeters()); 
+      
+     System.out.println("LEFT MOTOR DISTANCE:::::: " + getLeftDistanceMeters());
+     System.out.println("RIGHT MOTOR DISTANCE:::::: " + getRightDistanceMeters());
+    }  
+}
